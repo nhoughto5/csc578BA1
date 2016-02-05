@@ -1,4 +1,6 @@
 set(SOURCE_LIST
+	"${Cloth_SOURCE_ROOT}/SplineManager.cpp"
+	"${Cloth_SOURCE_ROOT}/Cloth.cpp"
     "${Cloth_SOURCE_ROOT}/ClothCamera.cpp"
 	"${Cloth_SOURCE_ROOT}/Grid.cpp"
 	"${Cloth_SOURCE_ROOT}/Ball.cpp"

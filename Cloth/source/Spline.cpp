@@ -15,6 +15,7 @@ Spline::Spline(int totalFrames) :
 	USING_ATLAS_MATH_NS;
 	USING_ATLAS_GL_NS;
 
+	//Bezier
 	mBasisMatrix = Matrix4(
 		1.0f, 0.0f, 0.0f, 0.0f,
 		-3.0f, 3.0f, 0.0f, 0.0f,
@@ -23,7 +24,7 @@ Spline::Spline(int totalFrames) :
 
 	mControlPoints = std::vector<Point>
 	{
-		{ -20, 5, 0 },
+		{ -20, -5, 0 },
 		{ -19, 5, -15 },
 		{ 12.7f, -5, -1.4f },
 		{ 20, 8.2f, 4.4f }

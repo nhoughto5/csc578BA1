@@ -11,9 +11,12 @@ ClothScene::ClothScene() :
 	mTick(1.0f / mFPS),
 	mAnimTime(0.0f),
 	mAnimLength(10.0f),
-	mSpline(int(mAnimLength * mFPS))
+	mSpline(int(mAnimLength * mFPS)),
+	ballPosition{ 0.0f, 0.0f, 0.0f }
 {
 	glEnable(GL_DEPTH_TEST);
+	auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);
+	mBall.transformGeometry(mat);
 }
 
 ClothScene::~ClothScene() {
@@ -74,10 +77,6 @@ void ClothScene::mousePressEvent(int button, int action, int modifiers, double x
 }
 
 void ClothScene::mouseMoveEvent(double xPos, double yPos) {
-	//if (mIsDragging)
-	//{
-	//	mCamera.mouseDrag(atlas::math::Point2(xPos, yPos));
-	//}
 	mCamera.mouseUpdate(glm::vec2(xPos, yPos));
 }
 void ClothScene::keyPressEvent(int key, int scancode, int action, int mods) {
@@ -92,28 +91,28 @@ void ClothScene::keyPressEvent(int key, int scancode, int action, int mods) {
 			mCamera.resetCamera();
 			break;
 		case GLFW_KEY_W:
-			mCamera.strafeCamera(0);
+			mCamera.strafeCamera(0, ballPosition);
 			break;
 		case GLFW_KEY_S:
-			mCamera.strafeCamera(1);
+			mCamera.strafeCamera(1, ballPosition);
 			break;
 		case GLFW_KEY_A:
-			mCamera.strafeCamera(2);
+			mCamera.strafeCamera(2, ballPosition);
 			break;
 		case GLFW_KEY_D:
-			mCamera.strafeCamera(3);
+			mCamera.strafeCamera(3, ballPosition);
 			break;
 		case GLFW_KEY_R:
-			mCamera.strafeCamera(4);
+			mCamera.strafeCamera(4, ballPosition);
 			break;
 		case GLFW_KEY_F:
-			mCamera.strafeCamera(5);
+			mCamera.strafeCamera(5, ballPosition);
 			break;
 		case GLFW_KEY_Q:
-			mCamera.strafeCamera(6);
+			mCamera.strafeCamera(6, ballPosition);
 			break;
 		case GLFW_KEY_E:
-			mCamera.strafeCamera(7);
+			mCamera.strafeCamera(7, ballPosition);
 			break;
 		case GLFW_KEY_C:
 			mCamera.newPosition(glm::vec3(0.0f, 3.0f, 0.0f));
@@ -176,8 +175,8 @@ void ClothScene::updateScene(double time)
 
 			auto point = mSpline.getSplinePosition();
 			mCamera.newPosition(point);
-			mCamera.lookAt(glm::vec3{ 0.0f, 0.0f, 0.0f });
-			auto mat = glm::translate(atlas::math::Matrix4(1.0f), glm::vec3{ 0.0f, 0.0f, 0.0f });
+			mCamera.lookAt(ballPosition);
+			auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);
 			mBall.transformGeometry(mat);
 		}
 

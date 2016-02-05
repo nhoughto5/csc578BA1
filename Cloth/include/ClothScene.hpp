@@ -4,6 +4,7 @@
 
 #include <atlas\utils\Scene.hpp>
 #include "ClothCamera.hpp"
+#include "SplineManager.hpp"
 #include "Grid.hpp"
 #include "Spline.h"
 #include "Ball.hpp"
@@ -29,7 +30,7 @@ private:
 
 	float mAnimTime;
 	float mAnimLength;
-
+	glm::vec3 ballPosition;
 	ClothCamera mCamera;
 	Grid mGrid;
 	Spline mSpline;

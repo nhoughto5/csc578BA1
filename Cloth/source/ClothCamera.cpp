@@ -18,7 +18,7 @@ glm::mat4 ClothCamera::getCameraMatrix() {
 	return glm::lookAt(position, position + viewDirection, upDirection);
 }
 
-void ClothCamera::strafeCamera(int direction) {
+void ClothCamera::strafeCamera(int direction, glm::vec3 ballPosition) {
 	switch (direction) {
 	case 0:
 		position += MOVEMENT_SPEED * viewDirection;
@@ -47,14 +47,18 @@ void ClothCamera::strafeCamera(int direction) {
 	default:
 		break;
 	}
-	std::cout << "Position: " << position.x << ", " << position.y << ", " << position.z << "\n";
+	//glm::vec3 diff = -normalize(position - ballPosition);
+	//std::cout << "Position: " << position.x << ", " << position.y << ", " << position.z << "    ";
+	//std::cout << "Diff: " << diff.x << ", " << diff.y << ", " << diff.z << "    ";
+	//std::cout << "View: " << viewDirection.x << ", " << viewDirection.y << ", " << viewDirection.z << "\n";
+	
 }
 void ClothCamera::newPosition(glm::vec3 newPosition) {
 	position = newPosition + 0.1f * upDirection;
 
 }
 void ClothCamera::lookAt(glm::vec3 target) {
-	viewDirection = position - target;
+	viewDirection = -normalize(position - target);
 }
 void ClothCamera::mouseUpdate(const glm::vec2& newMousePosition) {
 	glm::vec2 mouseDelta = newMousePosition - oldMousePosition;

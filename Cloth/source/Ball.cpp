@@ -1,5 +1,5 @@
 #include "Ball.hpp"
-
+#include "ShaderPaths.hpp"
 #include <atlas/core/Float.hpp>
 #include <atlas/core/Log.hpp>
 
@@ -9,10 +9,12 @@ Ball::Ball() :
     USING_ATLAS_MATH_NS;
     USING_ATLAS_GL_NS;
 
+	std::string shaderDir = generated::ShaderPaths::getShaderDirectory();
+
     std::vector<ShaderInfo> shaders
     {
-        { GL_VERTEX_SHADER, "shaders/ball.vs.glsl" },
-        { GL_FRAGMENT_SHADER, "shaders/ball.fs.glsl" }
+        { GL_VERTEX_SHADER, shaderDir + "ball.vs.glsl" },
+        { GL_FRAGMENT_SHADER, shaderDir +"ball.fs.glsl" }
     };
 
     mShaders.push_back(ShaderPointer(new Shader));

@@ -1,5 +1,6 @@
 set(INCLUDE_LIST
     "${Cloth_INCLUDE_ROOT}/Cloth.hpp"
+	"${Cloth_INCLUDE_ROOT}/SplineManager.hpp"
 	"${Cloth_INCLUDE_ROOT}/Grid.hpp"
 	"${Cloth_INCLUDE_ROOT}/Spline.h"
 	"${Cloth_INCLUDE_ROOT}/Ball.hpp"
