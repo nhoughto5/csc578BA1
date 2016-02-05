@@ -31,4 +31,6 @@ add_subdirectory("${ANIM_ATLAS_ROOT}")
 #add_subdirectory("${ANIM_SOURCE_DIR}/lab02-euler")
 #add_subdirectory("${ANIM_SOURCE_DIR}/lab03-integration")
 add_subdirectory("${ANIM_SOURCE_DIR}/lab04-splines")
+add_subdirectory("${ANIM_SOURCE_DIR}/A1")
+add_subdirectory("${ANIM_SOURCE_DIR}/Cloth")
 

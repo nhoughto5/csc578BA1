@@ -1,0 +1,9 @@
+set(INCLUDE_LIST
+    "${Cloth_INCLUDE_ROOT}/Cloth.hpp"
+	"${Cloth_INCLUDE_ROOT}/Grid.hpp"
+	"${Cloth_INCLUDE_ROOT}/Spline.h"
+	"${Cloth_INCLUDE_ROOT}/Ball.hpp"
+	"${Cloth_INCLUDE_ROOT}/ClothCamera.hpp"
+	"${Cloth_INCLUDE_ROOT}/ClothScene.hpp"
+    PARENT_SCOPE
+    )

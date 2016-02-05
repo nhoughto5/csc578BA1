@@ -1,0 +1,9 @@
+set(INCLUDE_LIST
+    "${A1_INCLUDE_ROOT}/SpringScene.hpp"
+    "${A1_INCLUDE_ROOT}/angularSpring.hpp"
+	"${A1_INCLUDE_ROOT}/Spring.hpp"
+	"${A1_INCLUDE_ROOT}/ObjectGenerator.h"
+	"${A1_INCLUDE_ROOT}/ShapeData.h"
+	"${A1_INCLUDE_ROOT}/Vertex.h"
+    PARENT_SCOPE
+    )
