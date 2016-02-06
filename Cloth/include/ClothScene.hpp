@@ -33,7 +33,7 @@ private:
 	glm::vec3 ballPosition;
 	ClothCamera mCamera;
 	Grid mGrid;
-	Spline mSpline;
+	SplineManager mSplineManager;
 	Ball mBall;
 };
 

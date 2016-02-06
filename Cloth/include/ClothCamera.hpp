@@ -10,7 +10,7 @@ public:
 	~ClothCamera();
 
 	glm::mat4 getCameraMatrix() override;
-	void strafeCamera(int direction, glm::vec3 ballPosition);
+	void strafeCamera(int direction);
 	void mouseUpdate(const glm::vec2& nowMousePosition);
 	void newPosition(glm::vec3 newPosition);
 	void lookAt(glm::vec3 target);

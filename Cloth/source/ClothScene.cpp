@@ -3,6 +3,7 @@
 #include <atlas/core/Log.hpp>
 #include <atlas/core/Macros.hpp>
 #include <atlas/core/Float.hpp>
+#include <iostream>
 
 ClothScene::ClothScene() : 
 	mIsPlaying(false),
@@ -11,8 +12,8 @@ ClothScene::ClothScene() :
 	mTick(1.0f / mFPS),
 	mAnimTime(0.0f),
 	mAnimLength(10.0f),
-	mSpline(int(mAnimLength * mFPS)),
-	ballPosition{ 0.0f, 0.0f, 0.0f }
+	mSplineManager(int(mAnimLength * mFPS)),
+	ballPosition{ -10.0f, 0.0f, 14.0f }
 {
 	glEnable(GL_DEPTH_TEST);
 	auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);
@@ -20,7 +21,6 @@ ClothScene::ClothScene() :
 }
 
 ClothScene::~ClothScene() {
-
 }
 
 void ClothScene::mousePressEvent(int button, int action, int modifiers, double xPos, double yPos) {
@@ -91,43 +91,43 @@ void ClothScene::keyPressEvent(int key, int scancode, int action, int mods) {
 			mCamera.resetCamera();
 			break;
 		case GLFW_KEY_W:
-			mCamera.strafeCamera(0, ballPosition);
+			mCamera.strafeCamera(0);
 			break;
 		case GLFW_KEY_S:
-			mCamera.strafeCamera(1, ballPosition);
+			mCamera.strafeCamera(1);
 			break;
 		case GLFW_KEY_A:
-			mCamera.strafeCamera(2, ballPosition);
+			mCamera.strafeCamera(2);
 			break;
 		case GLFW_KEY_D:
-			mCamera.strafeCamera(3, ballPosition);
+			mCamera.strafeCamera(3);
 			break;
 		case GLFW_KEY_R:
-			mCamera.strafeCamera(4, ballPosition);
+			mCamera.strafeCamera(4);
 			break;
 		case GLFW_KEY_F:
-			mCamera.strafeCamera(5, ballPosition);
+			mCamera.strafeCamera(5);
 			break;
 		case GLFW_KEY_Q:
-			mCamera.strafeCamera(6, ballPosition);
+			mCamera.strafeCamera(6);
 			break;
 		case GLFW_KEY_E:
-			mCamera.strafeCamera(7, ballPosition);
+			mCamera.strafeCamera(7);
 			break;
 		case GLFW_KEY_C:
 			mCamera.newPosition(glm::vec3(0.0f, 3.0f, 0.0f));
 			break;
 		case GLFW_KEY_U:
-			mSpline.showSpline();
+			mSplineManager.showSpline();
 			break;
 		case GLFW_KEY_I:
-			mSpline.showControlPoints();
+			mSplineManager.showControlPoints();
 			break;
 		case GLFW_KEY_O:
-			mSpline.showCage();
+			mSplineManager.showCage();
 			break;
 		case GLFW_KEY_P:
-			mSpline.showSplinePoints();
+			mSplineManager.showSplinePoints();
 			break;
 		case GLFW_KEY_SPACE:
 			mIsPlaying = !mIsPlaying;
@@ -149,11 +149,12 @@ void ClothScene::renderScene() {
 
 	mView = mCamera.getCameraMatrix();
 	mGrid.renderGeometry(mProjection, mView);
-	mSpline.renderGeometry(mProjection, mView);
+	mSplineManager.renderGeometry(mProjection, mView);
 	mBall.renderGeometry(mProjection, mView);
 }
 void ClothScene::updateScene(double time)
 {
+
 	mTime.currentTime = (float)time;
 	mTime.totalTime += (float)time;
 
@@ -165,15 +166,15 @@ void ClothScene::updateScene(double time)
 		if (mIsPlaying)
 		{
 			mAnimTime += mTick;
-			mSpline.updateGeometry(mTime);
+			mSplineManager.updateGeometry(mTime);
 
-			if (mSpline.doneInterpolation())
+			if (mSplineManager.doneInterpolation())
 			{
 				mIsPlaying = false;
 				return;
 			}
 
-			auto point = mSpline.getSplinePosition();
+			auto point = mSplineManager.getSplinePosition();
 			mCamera.newPosition(point);
 			mCamera.lookAt(ballPosition);
 			auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);

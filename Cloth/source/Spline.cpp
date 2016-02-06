@@ -2,7 +2,7 @@
 #include "ShaderPaths.hpp"
 #include <atlas/core/Macros.hpp>
 
-Spline::Spline(int totalFrames) :
+Spline::Spline(int totalFrames, std::vector<atlas::math::Point> mControlPoints_) :
 	mResolution(500),
 	mTotalFrames(totalFrames),
 	mCurrentFrame(0),
@@ -22,13 +22,14 @@ Spline::Spline(int totalFrames) :
 		3.0f, -6.0f, 3.0f, 0.0f,
 		-1.0f, 3.0f, -3.0f, 1.0f);
 
-	mControlPoints = std::vector<Point>
-	{
-		{ -20, -5, 0 },
-		{ -19, 5, -15 },
-		{ 12.7f, -5, -1.4f },
-		{ 20, 8.2f, 4.4f }
-	};
+	//mControlPoints = std::vector<Point>
+	//{
+	//	{ -20, -5, 0 },
+	//	{ -19, 5, -15 },
+	//	{ 12.7f, -5, -1.4f },
+	//	{ 20, 8.2f, 4.4f }
+	//};
+	mControlPoints = mControlPoints_;
 
 	std::vector<Point> splinePoints;
 
@@ -74,7 +75,78 @@ Spline::Spline(int totalFrames) :
 	mShaders[0]->disableShaders();
 	glBindVertexArray(0);
 }
+Spline::Spline(int totalFrames) :
+	mResolution(500),
+	mTotalFrames(totalFrames),
+	mCurrentFrame(0),
+	mShowControlPoints(false),
+	mShowCage(false),
+	mShowSplinePoints(false),
+	mShowSpline(false),
+	mIsInterpolationDone(false)
+{
+	USING_ATLAS_MATH_NS;
+	USING_ATLAS_GL_NS;
 
+	//Bezier
+	mBasisMatrix = Matrix4(
+		1.0f, 0.0f, 0.0f, 0.0f,
+		-3.0f, 3.0f, 0.0f, 0.0f,
+		3.0f, -6.0f, 3.0f, 0.0f,
+		-1.0f, 3.0f, -3.0f, 1.0f);
+
+	mControlPoints = std::vector<Point>
+	{
+		{ -20, -5, 0 },
+		{ -19, 5, -15 },
+		{ 12.7f, -5, -1.4f },
+		{ 20, 8.2f, 4.4f }
+	};
+
+	std::vector<Point> splinePoints;
+
+	float scale = 1.0f / mResolution;
+	for (int res = 0; res < mResolution + 1; ++res)
+	{
+		splinePoints.push_back(evaluateSpline(scale * res));
+	}
+
+	generateArcLengthTable();
+
+	glGenVertexArrays(1, &mVao);
+	glBindVertexArray(mVao);
+
+	glGenBuffers(1, &mControlBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mControlBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * mControlPoints.size(),
+		mControlPoints.data(), GL_STATIC_DRAW);
+
+	glGenBuffers(1, &mSplineBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, mSplineBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * splinePoints.size(), splinePoints.data(), GL_STATIC_DRAW);
+
+	std::string shaderDir = generated::ShaderPaths::getShaderDirectory();
+
+	std::vector<ShaderInfo> shaders
+	{
+		{ GL_VERTEX_SHADER, shaderDir + "spline.vs.glsl" },
+		{ GL_FRAGMENT_SHADER, shaderDir + "spline.fs.glsl" }
+	};
+
+	mShaders.push_back(ShaderPointer(new Shader));
+	mShaders[0]->compileShaders(shaders);
+	mShaders[0]->linkShaders();
+
+	GLuint var;
+	var = mShaders[0]->getUniformVariable("uMVP");
+	mUniforms.insert(UniformKey("uMVP", var));
+
+	var = mShaders[0]->getUniformVariable("fColour");
+	mUniforms.insert(UniformKey("fColour", var));
+
+	mShaders[0]->disableShaders();
+	glBindVertexArray(0);
+}
 Spline::~Spline()
 {
 	glDeleteVertexArrays(1, &mVao);
@@ -280,4 +352,7 @@ float Spline::chooseEpsilon()
 	}
 
 	return epsilon;
+}
+void Spline::setSplineCoordinates(std::vector<atlas::math::Point> mControlPoints_) {
+	mControlPoints = mControlPoints_;
 }

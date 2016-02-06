@@ -4,10 +4,11 @@
 #pragma once
 
 #include <atlas/utils/Geometry.hpp>
-
+#include <fstream>
 class Spline : public atlas::utils::Geometry
 {
 public:
+	Spline(int totalFrames, std::vector<atlas::math::Point> mControlPoints_);
 	Spline(int totalFrames);
 	~Spline();
 
@@ -23,7 +24,7 @@ public:
 	bool doneInterpolation();
 
 	atlas::math::Point getSplinePosition();
-
+	void setSplineCoordinates(std::vector<atlas::math::Point> mControlPoints_);
 private:
 	atlas::math::Point interpolateOnSpline();
 
