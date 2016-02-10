@@ -18,12 +18,27 @@ public:
 	void showSplinePoints();
 	bool doneInterpolation();
 	void updateGeometry(atlas::utils::Time const& t) override;
-	void renderGeometry(atlas::math::Matrix4 projection,atlas::math::Matrix4 view) override;
+	void renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4 view) override;
 private:
+	std::vector<atlas::math::Point> mAllSplinePoints;
+
 	std::vector<Spline> mSplines;
-	std::vector<atlas::math::Point> mControlPoints;
+	std::vector<atlas::math::Point> mAllSplinesControlPoints, mTempControlPoints;
 	int mTotalFrames;
 	int currentSpline;
 	bool finishedAllSplines;
+	GLuint mVao;
+	GLuint mControlBuffer;
+	GLuint mSplineBuffer;
+
+	bool mShowControlPoints;
+	bool mShowCage;
+	bool mShowSplinePoints;
+	bool mShowSpline;
+	bool mIsInterpolationDone;
+
+	int mResolution;
+	int mTotalFrames;
+	int mCurrentFrame;
 };
 #endif

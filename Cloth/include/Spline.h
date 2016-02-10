@@ -25,6 +25,8 @@ public:
 
 	atlas::math::Point getSplinePosition();
 	void setSplineCoordinates(std::vector<atlas::math::Point> mControlPoints_);
+	std::vector<atlas::math::Point> getControlPoints();
+	std::vector<atlas::math::Point> getSplinePoints();
 private:
 	atlas::math::Point interpolateOnSpline();
 
@@ -39,10 +41,10 @@ private:
 	std::vector<float> mTable;
 
 	atlas::math::Point mSplinePosition;
-
-	GLuint mVao;
-	GLuint mControlBuffer;
-	GLuint mSplineBuffer;
+	std::vector<atlas::math::Point> splinePoints;
+	//GLuint mVao;
+	//GLuint mControlBuffer;
+	//GLuint mSplineBuffer;
 
 	int mResolution;
 	int mTotalFrames;

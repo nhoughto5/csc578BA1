@@ -8,7 +8,8 @@
 #include "Grid.hpp"
 #include "Spline.h"
 #include "Ball.hpp"
-//#include "Cloth.hpp"
+#include "Axis.h"
+#include "Cloth.hpp"
 class ClothScene : public atlas::utils::Scene {
 public:
 	ClothScene();
@@ -33,8 +34,11 @@ private:
 	glm::vec3 ballPosition;
 	ClothCamera mCamera;
 	Grid mGrid;
-	SplineManager mSplineManager;
+	SplineManager mSplineManager;//, mSpline2;
 	Ball mBall;
+	Axis mAxis;
+	Cloth mCloth;
+	std::vector<atlas::math::Point> mControlPoints;
 };
 
 #endif

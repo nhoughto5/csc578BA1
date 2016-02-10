@@ -1,10 +1,14 @@
 set(SOURCE_LIST
 	"${Cloth_SOURCE_ROOT}/SplineManager.cpp"
 	"${Cloth_SOURCE_ROOT}/Cloth.cpp"
+	"${Cloth_SOURCE_ROOT}/Axis.cpp"
     "${Cloth_SOURCE_ROOT}/ClothCamera.cpp"
 	"${Cloth_SOURCE_ROOT}/Grid.cpp"
 	"${Cloth_SOURCE_ROOT}/Ball.cpp"
 	"${Cloth_SOURCE_ROOT}/Spline.cpp"
 	"${Cloth_SOURCE_ROOT}/ClothScene.cpp"
+	"${Cloth_SOURCE_ROOT}/ObjectGenerator.cpp"
 	"${Cloth_SOURCE_ROOT}/main.cpp"
+	"${Cloth_SOURCE_ROOT}/Particle.cpp"
+	"${Cloth_SOURCE_ROOT}/Spring.cpp"
     PARENT_SCOPE)

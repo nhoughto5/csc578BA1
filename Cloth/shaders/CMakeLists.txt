@@ -5,6 +5,8 @@ set(SHADER_SOURCE
 	"${Cloth_SHADER_ROOT}/spline.fs.glsl"
 	"${Cloth_SHADER_ROOT}/Grid.vs.glsl"
 	"${Cloth_SHADER_ROOT}/Grid.fs.glsl"
+	"${Cloth_SHADER_ROOT}/Axis.vs.glsl"
+	"${Cloth_SHADER_ROOT}/Axis.fs.glsl"
     "${Cloth_SHADER_ROOT}/Cloth.fs.glsl"
     "${Cloth_SHADER_ROOT}/Cloth.vs.glsl")
 

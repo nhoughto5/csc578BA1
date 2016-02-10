@@ -13,7 +13,8 @@ ClothScene::ClothScene() :
 	mAnimTime(0.0f),
 	mAnimLength(10.0f),
 	mSplineManager(int(mAnimLength * mFPS)),
-	ballPosition{ -10.0f, 0.0f, 14.0f }
+	ballPosition{ -10.0f, 0.0f, 14.0f },
+	mCloth(14, 10, 55, 45)
 {
 	glEnable(GL_DEPTH_TEST);
 	auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);
@@ -151,6 +152,8 @@ void ClothScene::renderScene() {
 	mGrid.renderGeometry(mProjection, mView);
 	mSplineManager.renderGeometry(mProjection, mView);
 	mBall.renderGeometry(mProjection, mView);
+	mAxis.renderGeometry(mProjection, mView);
+	mCloth.renderGeometry(mProjection, mView);
 }
 void ClothScene::updateScene(double time)
 {
