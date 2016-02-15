@@ -1,6 +1,6 @@
 #include "Particle.hpp"
-
-Particle::Particle(glm::vec3 pos, GLuint index_, glm::vec3 colour_) :
+#include <iostream>
+Particle::Particle(glm::vec3 pos, GLushort index_, glm::vec3 colour_) :
 	currentPosition(pos),
 	previousPosition(pos),
 	acceleration{ 0.0f, 0.0f, 0.0f },
@@ -12,7 +12,8 @@ Particle::Particle(glm::vec3 pos, GLuint index_, glm::vec3 colour_) :
 	mNormal{ 0.0f, 0.0f, 0.0f },
 	index(index_),
 	colour(colour_),
-	mass(0.5f)
+	mass(0.1f),
+	Damping(0.8f)
 {
 
 }
@@ -24,28 +25,50 @@ Particle::~Particle() {
 void Particle::addForce(glm::vec3 force) {
 	acceleration += force / mass;
 }
-
-//Verlet Integration
-void Particle::updateGeometry(atlas::utils::Time const& t, GLfloat DAMPING) {
+void limit(glm::vec3 & v, GLfloat maxLength) {
+	GLfloat lengthSquared = v.x * v.x + v.y * v.y + v.z * v.z;
+	
+	if ((lengthSquared > maxLength * maxLength) && (lengthSquared > 0)) {
+		GLfloat ratio = maxLength / glm::sqrt(lengthSquared);
+		v.x *= ratio;
+		v.y *= ratio;
+		v.z *= ratio;
+		
+	}
+}
+void Particle::updateGeometry(atlas::utils::Time const& t) {
 	if (!stationary) {
 		previousPosition = currentPosition;
 		glm::vec3 forceOfGravity = mass * gravity;
 		glm::vec3 forceOfAirResistance = -dragCoefficient * velocity * velocity;
-		glm::vec3 totalForce = forceOfGravity + forceOfAirResistance + wind + totalSpringForces;
+		glm::vec3 totalForce = forceOfGravity + mass*totalSpringForces - velocity*Damping;
 		acceleration = totalForce / mass;
 
 		//Perform Euler Integration
-		velocity += t.deltaTime * acceleration;
 		currentPosition += t.deltaTime * velocity;
+		velocity += t.deltaTime * acceleration;
+		//limit(velocity, 0.50f);
+		//velocity *= Damping;
 		//============== End Euler==============//
-
+		if (index == 55) {
+			std::cout << "totalSpringForces: " << totalSpringForces.x << ", " << totalSpringForces.y << ", " << totalSpringForces.z << "\n";
+			std::cout << "new Position " << currentPosition.x << ", " << currentPosition.y << ", " << currentPosition.z << "\n";
+		}
 		//Reset the forces acting on the particle from all of the springs
 		//So that a new accumulated total can be calculated.
 		totalSpringForces = glm::vec3{ 0.0f, 0.0f, 0.0f };
+		acceleration = glm::vec3{ 0.0f, 0.0f, 0.0f };
+
 	}
+}
+glm::vec3 Particle::getColour() {
+	return colour;
 }
 void Particle::makeMoveable() {
 	stationary = false;
+}
+GLushort Particle::getIndex() {
+	return index;
 }
 void Particle::makeStationary() {
 	stationary = true;
@@ -66,6 +89,7 @@ glm::vec3 Particle::getCurrentPosition() {
 
 void Particle::addToSumOfSpringForces(glm::vec3 force) {
 	totalSpringForces += force;
+	if(index == 55)	std::cout << "  Force Added: " << force.x << ", " << force.y << ", " << force.z << "\n";
 }
 void Particle::setWind(glm::vec3 wind_) {
 	wind = wind_;

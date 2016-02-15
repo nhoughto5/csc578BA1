@@ -11,4 +11,5 @@ set(SOURCE_LIST
 	"${Cloth_SOURCE_ROOT}/main.cpp"
 	"${Cloth_SOURCE_ROOT}/Particle.cpp"
 	"${Cloth_SOURCE_ROOT}/Spring.cpp"
+	"${Cloth_SOURCE_ROOT}/QuatCamera.cpp"
     PARENT_SCOPE)

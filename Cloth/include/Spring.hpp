@@ -12,6 +12,6 @@ public:
 private:
 	GLfloat k;
 	Particle *p1, *p2;
-	glm::vec3 restVector;
+	GLfloat restLength, currentLength;
 };
 #endif // !SPRING_HPP

@@ -12,6 +12,7 @@ public:
 	Cloth(GLfloat width, GLfloat height, GLuint numParticlesWide, GLuint numParticlesHigh);
 	~Cloth();
 	void renderGeometry(atlas::math::Matrix4 projection,atlas::math::Matrix4 view) override;
+	void updateGeometry(atlas::utils::Time const& t) override;
 private:
 
 	Particle* getParticle(GLuint x, GLuint y);
@@ -21,9 +22,9 @@ private:
 	GLuint numParticlesWide, numParticlesHigh, clothVertexBufferID, clothIndexBufferID;
 	GLuint VAO;
 	std::vector<Particle> mParticles;
-	std::vector<GLuint> mParticleIndices;
+	std::vector<GLushort> mParticleIndices;
 	std::vector<Spring> mSprings;
-	glm::vec3 clothRotationVector, clothTranslation;
-	
+	glm::vec3 clothRotationVector, clothPosition;
+	GLfloat restLength;
 };
 #endif // !CLOTH_HPP

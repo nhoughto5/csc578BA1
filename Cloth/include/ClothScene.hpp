@@ -3,13 +3,14 @@
 #pragma once
 
 #include <atlas\utils\Scene.hpp>
-#include "ClothCamera.hpp"
+//#include "ClothCamera.hpp"
 #include "SplineManager.hpp"
 #include "Grid.hpp"
 #include "Spline.h"
 #include "Ball.hpp"
 #include "Axis.h"
 #include "Cloth.hpp"
+#include "QuatCamera.h"
 class ClothScene : public atlas::utils::Scene {
 public:
 	ClothScene();
@@ -32,13 +33,15 @@ private:
 	float mAnimTime;
 	float mAnimLength;
 	glm::vec3 ballPosition;
-	ClothCamera mCamera;
+	//ClothCamera mCamera;
+	QuatCamera mCamera;
 	Grid mGrid;
 	SplineManager mSplineManager;//, mSpline2;
 	Ball mBall;
 	Axis mAxis;
 	Cloth mCloth;
 	std::vector<atlas::math::Point> mControlPoints;
+
 };
 
 #endif

@@ -1,44 +1,37 @@
-#ifndef SPLINEMANAGER_HPP
-#define SPLINEMANAGER_HPP
+#ifndef SPLINE_MANAGER_HPP
+#define SPLINE_MANAGER_HPP
 #pragma once
 #include <atlas/utils/Geometry.hpp>
 #include "Spline.h"
-USING_ATLAS_MATH_NS;
-USING_ATLAS_GL_NS;
 class SplineManager : public atlas::utils::Geometry {
 public:
-	SplineManager(int totalFrames);
+	SplineManager(GLuint framesPerSpline_);
 	~SplineManager();
 
-	atlas::math::Point getSplinePosition();
+	void renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4 view) override;
+	void updateGeometry(atlas::utils::Time const& t) override;
+
 	void addSplines();
-	void showSpline();
 	void showControlPoints();
 	void showCage();
 	void showSplinePoints();
+	void showSpline();
 	bool doneInterpolation();
-	void updateGeometry(atlas::utils::Time const& t) override;
-	void renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4 view) override;
+	atlas::math::Point getSplinePosition();
 private:
-	std::vector<atlas::math::Point> mAllSplinePoints;
-
+	atlas::math::Point interpolateOnSpline();
+	void setUpVAOs();
+	//==== Memebers ====//
+	GLuint splinePointVertexArrayObject, controlPointVertexArrayObject, mControlBuffer, mSplineBuffer, currentSpline;
 	std::vector<Spline> mSplines;
-	std::vector<atlas::math::Point> mAllSplinesControlPoints, mTempControlPoints;
-	int mTotalFrames;
-	int currentSpline;
-	bool finishedAllSplines;
-	GLuint mVao;
-	GLuint mControlBuffer;
-	GLuint mSplineBuffer;
-
+	std::vector<glm::vec3> allSplinePoints, allControlPoints;
+	GLuint framesPerSpline, mResolution, mCurrentFrame;
+	glm::mat4 mBasisMatrix;
 	bool mShowControlPoints;
 	bool mShowCage;
 	bool mShowSplinePoints;
 	bool mShowSpline;
 	bool mIsInterpolationDone;
 
-	int mResolution;
-	int mTotalFrames;
-	int mCurrentFrame;
 };
 #endif

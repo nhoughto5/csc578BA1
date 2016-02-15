@@ -1,60 +1,34 @@
-#ifndef LAB04_INCLUDE_SPLINE_HPP
-#define LAB04_INCLUDE_SPLINE_HPP
-
-#pragma once
+#ifndef SPLINE_H
+#define SPLINE_H
 
 #include <atlas/utils/Geometry.hpp>
-#include <fstream>
-class Spline : public atlas::utils::Geometry
-{
+USING_ATLAS_MATH_NS;
+USING_ATLAS_GL_NS;
+class Spline{
 public:
-	Spline(int totalFrames, std::vector<atlas::math::Point> mControlPoints_);
-	Spline(int totalFrames);
+	Spline(GLuint totalFrames_, std::vector<atlas::math::Point> controlPoints_, glm::mat4 mBasisMatrix_, int mResolution_, glm::vec3 colour_);
 	~Spline();
-
-	void renderGeometry(atlas::math::Matrix4 projection,
-		atlas::math::Matrix4 view) override;
-
-	void updateGeometry(atlas::utils::Time const& t) override;
-
-	void showControlPoints();
-	void showCage();
-	void showSplinePoints();
-	void showSpline();
-	bool doneInterpolation();
-
-	atlas::math::Point getSplinePosition();
-	void setSplineCoordinates(std::vector<atlas::math::Point> mControlPoints_);
 	std::vector<atlas::math::Point> getControlPoints();
-	std::vector<atlas::math::Point> getSplinePoints();
-private:
-	atlas::math::Point interpolateOnSpline();
+	glm::vec3 getColour();
 
 	atlas::math::Point evaluateSpline(float t);
 	void generateArcLengthTable();
+	atlas::math::Point getSplinePosition();
+	void updateGeometry(atlas::utils::Time const& t);
+	bool doneInterpolation();
+private:
+	
 	int tableLookUp(float distance);
 	float chooseEpsilon();
-
-	atlas::math::Matrix4 mBasisMatrix;
+	
+	atlas::math::Point interpolateOnSpline();
+	GLuint mTotalFrames, mCurrentFrame;
 	std::vector<atlas::math::Point> mControlPoints;
-
-	std::vector<float> mTable;
-
 	atlas::math::Point mSplinePosition;
-	std::vector<atlas::math::Point> splinePoints;
-	//GLuint mVao;
-	//GLuint mControlBuffer;
-	//GLuint mSplineBuffer;
-
+	std::vector<float> mTable;
+	glm::vec3 colour;
+	glm::mat4 mBasisMatrix;
 	int mResolution;
-	int mTotalFrames;
-	int mCurrentFrame;
-
-	bool mShowControlPoints;
-	bool mShowCage;
-	bool mShowSplinePoints;
-	bool mShowSpline;
 	bool mIsInterpolationDone;
 };
-
-#endif
+#endif // !SPLINE_H

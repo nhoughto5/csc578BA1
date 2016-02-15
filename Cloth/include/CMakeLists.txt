@@ -12,5 +12,6 @@ set(INCLUDE_LIST
 	"${Cloth_INCLUDE_ROOT}/ClothScene.hpp"
 	"${Cloth_INCLUDE_ROOT}/Spring.hpp"
 	"${Cloth_INCLUDE_ROOT}/Particle.hpp"
+	"${Cloth_INCLUDE_ROOT}/QuatCamera.h"
     PARENT_SCOPE
     )

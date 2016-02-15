@@ -1,7 +1,6 @@
 #version 330 core
 
-uniform vec3 fColour;
-
+in vec3 fColour;
 out vec4 colour;
 
 void main()

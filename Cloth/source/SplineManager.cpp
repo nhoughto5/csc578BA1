@@ -1,33 +1,45 @@
 #include "SplineManager.hpp"
 #include "ShaderPaths.hpp"
-SplineManager::SplineManager(int totalFrames) :
-	finishedAllSplines(false),
-	currentSpline(0),
+#include <iostream>
+SplineManager::SplineManager(GLuint framesPerSpline_):
+	framesPerSpline(framesPerSpline_),
 	mResolution(500),
-	mTotalFrames(totalFrames),
 	mCurrentFrame(0),
 	mShowControlPoints(false),
 	mShowCage(false),
 	mShowSplinePoints(false),
-	mShowSpline(true),
-	mIsInterpolationDone(false)
+	mShowSpline(false),
+	mIsInterpolationDone(false),
+	currentSpline(0)
 {
-	mTotalFrames = totalFrames;
+	//Bezier
+	mBasisMatrix = Matrix4(
+		1.0f, 0.0f, 0.0f, 0.0f,
+		-3.0f, 3.0f, 0.0f, 0.0f,
+		3.0f, -6.0f, 3.0f, 0.0f,
+		-1.0f, 3.0f, -3.0f, 1.0f);
 	addSplines();
 
-	glGenVertexArrays(1, &mVao);
-	glBindVertexArray(mVao);
+	float scale = 1.0f / mResolution;
+	for (GLuint i = 0; i < mSplines.size(); ++i) {
+		for (int res = 0; res < mResolution + 1; ++res) {
+			allSplinePoints.push_back(mSplines[i].evaluateSpline(scale * res));
+			allSplinePoints.push_back(mSplines[i].getColour());
+		}
+		mSplines[i].generateArcLengthTable();
+	}
 
 	glGenBuffers(1, &mControlBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mControlBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * mAllSplinesControlPoints.size(), mAllSplinesControlPoints.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * allControlPoints.size(),	allControlPoints.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &mSplineBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, mSplineBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * mAllSplinePoints.size(), mAllSplinePoints.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * allSplinePoints.size(), allSplinePoints.data(), GL_STATIC_DRAW);
+
+	setUpVAOs();
 
 	std::string shaderDir = generated::ShaderPaths::getShaderDirectory();
-
 	std::vector<ShaderInfo> shaders
 	{
 		{ GL_VERTEX_SHADER, shaderDir + "spline.vs.glsl" },
@@ -42,120 +54,94 @@ SplineManager::SplineManager(int totalFrames) :
 	var = mShaders[0]->getUniformVariable("uMVP");
 	mUniforms.insert(UniformKey("uMVP", var));
 
-	var = mShaders[0]->getUniformVariable("fColour");
-	mUniforms.insert(UniformKey("fColour", var));
-
 	mShaders[0]->disableShaders();
-	glBindVertexArray(0);
 }
 SplineManager::~SplineManager() {
-	glDeleteVertexArrays(1, &mVao);
-	glDeleteVertexArrays(1, &mControlBuffer);
-	glDeleteVertexArrays(1, &mSplineBuffer);
+
 }
-void SplineManager::addSplines() {
-	mTempControlPoints = std::vector<Point>
-	{
-		{ -20, -5, 0 },
-		{ -19, 5, -15 },
-		{ 12.7f, -5, -1.4f },
-		{ 20, 8.2f, 4.4f }
-	};
-	mSplines.push_back(Spline(mTotalFrames, mTempControlPoints));
+void SplineManager::setUpVAOs() {
+	glGenVertexArrays(1, &controlPointVertexArrayObject);
+	glGenVertexArrays(1, &splinePointVertexArrayObject);
 
+	glBindVertexArray(splinePointVertexArrayObject);
+	glEnableVertexAttribArray(0); //SplinePoint positions
+	glEnableVertexAttribArray(1); //Spline point Colours
+	glBindBuffer(GL_ARRAY_BUFFER, mSplineBuffer);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(sizeof(float) * 3));
 
-	for (int i = 0; i < mSplines.size(); ++i) {
-		mAllSplinesControlPoints.insert(mAllSplinesControlPoints.end(),mSplines[i].getControlPoints().begin(), mSplines[i].getControlPoints().end());
-		mAllSplinePoints.insert(mAllSplinePoints.end(),mSplines[i].getSplinePoints().begin(), mSplines[i].getSplinePoints().end());
-	}
+	glBindVertexArray(controlPointVertexArrayObject);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, mControlBuffer);
+	glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
 }
 void SplineManager::renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4 view) {
 	USING_ATLAS_MATH_NS;
-
 	mShaders[0]->enableShaders();
 
-	glBindVertexArray(mVao);
-
+	glBindVertexArray(splinePointVertexArrayObject);
 	Matrix4 mvp = projection * view * mModel;
 	glUniformMatrix4fv(mUniforms["uMVP"], 1, GL_FALSE, &mvp[0][0]);
 
-	// Draw the control points first.
-	glUniform3f(mUniforms["fColour"], 1, 0, 0);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mControlBuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	if (mShowControlPoints)
-	{
-		glPointSize(5.0f);
-		glDrawArrays(GL_POINTS, 0, GLsizei(mAllSplinesControlPoints.size()));
-		glPointSize(1.0f);
-	}
-
-	if (mShowCage)
-	{
-		glDrawArrays(GL_LINE_STRIP, 0, GLsizei(mAllSplinesControlPoints.size()));
-	}
-
-	// Now draw the spline.
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, mSplineBuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-	glUniform3f(mUniforms["fColour"], 0, 1, 0);
-
-	if (mShowSpline)
-	{
-		glLineWidth(5.0f);
-		glDrawArrays(GL_LINE_STRIP, 0, mResolution + 1);
-		glLineWidth(1.0f);
-	}
-
-	if (mShowSplinePoints)
-	{
-		glPointSize(8.0f);
-		glDrawArrays(GL_POINTS, 1, mResolution);
-		glPointSize(1.0f);
-	}
-
-	glDisableVertexAttribArray(0);
-
+	glLineWidth(5.0f);
+	glDrawArrays(GL_LINE_STRIP, 0, (mResolution + 1) * mSplines.size());
+	glLineWidth(1.0f);
 	mShaders[0]->disableShaders();
-}
-void SplineManager::updateGeometry(atlas::utils::Time const& t) {
-	mSplines[currentSpline].updateGeometry(t);
-	if (mSplines[currentSpline].doneInterpolation()) {
-		++currentSpline;
-		if (currentSpline == mSplines.size()) {
-			finishedAllSplines = true;
-		}
-	}
 }
 
 atlas::math::Point SplineManager::getSplinePosition() {
 	return mSplines[currentSpline].getSplinePosition();
 }
-void SplineManager::showSpline() {
-	//for (int i = 0; i < mSplines.size(); ++i) {
-	//	mSplines[i].showSpline();
-	//}
-	mShowSpline = !mShowSpline;
+void SplineManager::updateGeometry(atlas::utils::Time const& t) {
+	mSplines[currentSpline].updateGeometry(t);
+	if (mSplines[currentSpline].doneInterpolation()) {
+		++currentSpline;
+	}
+	if (currentSpline == mSplines.size()) mIsInterpolationDone = true;
+}
+
+void SplineManager::addSplines() {
+
+	std::vector<Point> tempControlPoints = std::vector<Point>
+	{
+		{ -10.0f, 5.0f, 0.0f }, //A0
+		{ -10.0f, 5.0f, 4.0f }, //A1
+		{ -4.0f, 5.0f, 10.0f }, //A2
+		{ 0.0f, 5.0f, 10.0f } //A3
+	};
+	glm::vec3 splineColour{1.0f, 0.0f, 0.0f};
+
+
+	std::vector<Point> tempControlPoints2 = std::vector<Point>{
+		tempControlPoints[3], //B0
+		{4.0f, 5.0f, 10.0f }, //B1
+		{10.0f, 5.0f, 4.0f}, //B2
+		{ 10.0f, 5.0f, 0.0f }, //B3
+	};
+	glm::vec3 splineColour2 = glm::vec3{ 0.0f, 1.0f, 0.0f };
+	
+	mSplines.push_back(Spline(framesPerSpline, tempControlPoints, mBasisMatrix, mResolution, splineColour));
+	mSplines.push_back(Spline(framesPerSpline, tempControlPoints2, mBasisMatrix, mResolution, splineColour2));
 }
 void SplineManager::showControlPoints() {
-	for (int i = 0; i < mSplines.size(); ++i) {
-		mSplines[i].showControlPoints();
-	}
-	mShowControlPoints = !mShowControlPoints;
+
 }
 void SplineManager::showCage() {
-	for (int i = 0; i < mSplines.size(); ++i) {
-		mSplines[i].showCage();
-	}
+
 }
 void SplineManager::showSplinePoints() {
-	for (int i = 0; i < mSplines.size(); ++i) {
-		mSplines[i].showSplinePoints();
-	}
+
+}
+void SplineManager::showSpline() {
+
 }
 bool SplineManager::doneInterpolation() {
-	return finishedAllSplines;
+	bool X = true;
+	for (int i = 0; i < mSplines.size(); ++i) {
+		if (mSplines[i].doneInterpolation() == false) {
+			X = false;
+			
+		}
+	}
+	return X;
 }

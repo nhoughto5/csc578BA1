@@ -16,8 +16,8 @@ Spring::Spring() :
 	springWidth{ 0.05f }, //How close the node get to the spring axis
 	gravity{ -9.81f }, 
 	mVelocity(0.0f),
-	k(1.0f),//Spring Constant
-	mMass(0.03f),
+	k(1.5f),//Spring Constant
+	mMass(0.07f),
 	damping(0.05f)
 {
 	USING_ATLAS_GL_NS; //Short for atlas GL namespace
