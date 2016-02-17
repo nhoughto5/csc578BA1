@@ -23,7 +23,7 @@ public:
 	GLushort getIndex();
 	
 private:	
-	glm::vec3 currentPosition, colour, previousPosition, acceleration, totalSpringForces, gravity, wind, velocity, mNormal;
+	glm::vec3 currentPosition, colour, previousPosition, acceleration, forceOfGravity, totalSpringForces, gravity, wind, velocity, mNormal;
 	GLfloat mass, dragCoefficient;
 	bool stationary;
 	GLushort index;

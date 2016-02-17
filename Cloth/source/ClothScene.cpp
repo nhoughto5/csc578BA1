@@ -146,6 +146,10 @@ void ClothScene::keyPressEvent(int key, int scancode, int action, int mods) {
 		case GLFW_KEY_P:
 			mSplineManager.showSplinePoints();
 			break;
+		case GLFW_KEY_ENTER:
+			mCamera.setTarget(ballPosition);
+			mCamera.startSlerp(3);
+			break;
 		case GLFW_KEY_SPACE:
 			mIsPlaying = !mIsPlaying;
 
@@ -156,6 +160,7 @@ void ClothScene::keyPressEvent(int key, int scancode, int action, int mods) {
 }
 
 void ClothScene::screenResizeEvent(int width, int height) {
+
 	glViewport(0, 0, width, height);
 	mProjection = glm::perspective(glm::radians(45.0),(double)width / height, 1.0, 1000.0);
 }
@@ -164,7 +169,7 @@ void ClothScene::renderScene() {
 	glClearColor(grey, grey, grey, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	
+
 	mView = mCamera.getCameraMatrix();
 	mGrid.renderGeometry(mProjection, mView);
 	mSplineManager.renderGeometry(mProjection, mView);
@@ -202,6 +207,9 @@ void ClothScene::updateScene(double time)
 		}
 
 	}
-	//mCloth.updateGeometry(mTime);
+	if (mCamera.isSlerping()) {
+		mCamera.updateSlerp(mTime);
+	}
+	mCloth.updateGeometry(mTime);
 }
 

@@ -50,8 +50,8 @@ void Particle::updateGeometry(atlas::utils::Time const& t) {
 		//limit(velocity, 0.50f);
 		//velocity *= Damping;
 		//============== End Euler==============//
-		if (index == 55) {
-			std::cout << "totalSpringForces: " << totalSpringForces.x << ", " << totalSpringForces.y << ", " << totalSpringForces.z << "\n";
+		if (index == 3) {
+			std::cout << "totalSpringForces: " << totalSpringForces.x << ", " << totalSpringForces.y << ", " << totalSpringForces.z << "   Velocity: {" << velocity.x << ", " << velocity.y << ", " << velocity.z << "\n";
 			std::cout << "new Position " << currentPosition.x << ", " << currentPosition.y << ", " << currentPosition.z << "\n";
 		}
 		//Reset the forces acting on the particle from all of the springs
@@ -89,7 +89,7 @@ glm::vec3 Particle::getCurrentPosition() {
 
 void Particle::addToSumOfSpringForces(glm::vec3 force) {
 	totalSpringForces += force;
-	if(index == 55)	std::cout << "  Force Added: " << force.x << ", " << force.y << ", " << force.z << "\n";
+	if(index == 3)	std::cout << "  Force Added on 3: " << force.x << ", " << force.y << ", " << force.z << "\n";
 }
 void Particle::setWind(glm::vec3 wind_) {
 	wind = wind_;

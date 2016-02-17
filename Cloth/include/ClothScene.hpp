@@ -25,7 +25,6 @@ public:
 private:
 	bool mIsDragging;
 	bool mIsPlaying;
-
 	float mLastTime;
 	float mFPS;
 	float mTick;

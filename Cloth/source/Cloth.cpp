@@ -3,15 +3,15 @@
 Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint numParticlesHigh_) :
 	width(width_),
 	height(height_),
-	numParticlesHigh(numParticlesHigh_),
-	numParticlesWide(numParticlesWide_),
+	numParticlesHigh(10),
+	numParticlesWide(2),
 	clothRotationVector{0.0f, 0.0f, 0.0f},
 	clothPosition{ 0.0f, 5.0f, 0.0f },
 	clothRotationAngle(0.0f)
 {
 	USING_ATLAS_MATH_NS;
 	USING_ATLAS_GL_NS;
-	glm::vec3 clothColour{1.0f, 0.5f, 0.2f};
+	glm::vec3 clothColour{1.0f, 0.3f, 0.1f};
 	//Create Particles
 	GLuint count = 0;
 	restLength = (width * (1 / (float)numParticlesWide));
@@ -33,31 +33,28 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 			//Connect to the particle that is immediately below the current particle
 			if (y < numParticlesHigh - 1) mSprings.push_back(Spring(getParticle(x,y), getParticle(x,y+1)));
 
-			//============ Shear Springs ================//
-			//Connect the shear springs to make the X pattern
-			if (x < numParticlesWide - 1 && y < numParticlesHigh - 1) {
-				mSprings.push_back(Spring(getParticle(x, y), getParticle(x + 1, y + 1)));
-				mSprings.push_back(Spring(getParticle(x+1, y), getParticle(x, y+1)));
-			}
+			////============ Shear Springs ================//
+			////Connect the shear springs to make the X pattern
+			//if (x < numParticlesWide - 1 && y < numParticlesHigh - 1) {
+			//	mSprings.push_back(Spring(getParticle(x, y), getParticle(x + 1, y + 1)));
+			//	mSprings.push_back(Spring(getParticle(x+1, y), getParticle(x, y+1)));
+			//}
 
-			//============ Bend Springs ===============//
-			//Connect the current particle to the second particle over to the right
-			if (x < numParticlesWide - 2) mSprings.push_back(Spring(getParticle(x,y), getParticle(x+2,y)));
+			////============ Bend Springs ===============//
+			////Connect the current particle to the second particle over to the right
+			//if (x < numParticlesWide - 2) mSprings.push_back(Spring(getParticle(x,y), getParticle(x+2,y)));
 
-			//Connect the current particle to the particle two below
-			if (y < numParticlesHigh - 2) mSprings.push_back(Spring(getParticle(x,y), getParticle(x, y+2)));
-
-			////Create the X pattern 
-			//if (x < numParticlesWide - 2 && y < numParticlesHigh - 2) {
-			//	mSprings.push_back(Spring(getParticle(x, y), getParticle(x+2,y+2)));
-			//	mSprings.push_back(Spring(getParticle(x+2,y), getParticle(x,y+2)));
-			//};
+			////Connect the current particle to the particle two below
+			//if (y < numParticlesHigh - 2) mSprings.push_back(Spring(getParticle(x,y), getParticle(x, y+2)));
 		}
 	}
 
-	//Set the top left and right as stationary
-	getParticle(0, 0)->makeStationary();
-	getParticle(numParticlesWide - 1, 0)->makeStationary();
+	////Set the top left and right as stationary
+	//getParticle(0, 0)->makeStationary();
+	//getParticle(numParticlesWide - 1, 0)->makeStationary();
+	for (int i = 0; i < numParticlesWide; ++i) {
+		getParticle(i, 0)->makeStationary();
+	}
 
 	//Make Indices for Particles
 	for (GLuint row = 0; row < numParticlesWide - 1; ++row) {

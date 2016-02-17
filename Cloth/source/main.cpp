@@ -4,7 +4,7 @@
 
 int main()
 {
-	APPLICATION.createWindow(400, 400, "integration");
+	APPLICATION.createWindow(400, 400, "Cloth_Quaternion_Spline");
 	APPLICATION.addScene(new ClothScene);
 	APPLICATION.runApplication();
 
