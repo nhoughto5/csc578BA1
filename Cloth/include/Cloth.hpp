@@ -16,6 +16,8 @@ public:
 private:
 
 	Particle* getParticle(GLuint x, GLuint y);
+	void addWind(glm::vec3 windForce);
+	void addWindForceToTriangle(Particle* p1, Particle* p2, Particle* p3, glm::vec3 windForce);
 	void sendDataToGPU();
 	void defineVAO();
 	GLfloat width, height, clothRotationAngle;

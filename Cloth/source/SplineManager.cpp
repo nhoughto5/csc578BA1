@@ -100,6 +100,7 @@ void SplineManager::updateGeometry(atlas::utils::Time const& t) {
 	if (currentSpline == mSplines.size()) mIsInterpolationDone = true;
 }
 
+//This is where splines are created and added to a vector
 void SplineManager::addSplines() {
 
 	std::vector<Point> tempControlPoints = std::vector<Point>
@@ -137,10 +138,11 @@ void SplineManager::showSpline() {
 }
 bool SplineManager::doneInterpolation() {
 	bool X = true;
+	//If any of the splines are still interpolating send false
+	//Otherwise send true
 	for (int i = 0; i < mSplines.size(); ++i) {
 		if (mSplines[i].doneInterpolation() == false) {
 			X = false;
-			
 		}
 	}
 	return X;

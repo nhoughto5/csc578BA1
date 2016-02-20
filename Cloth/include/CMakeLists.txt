@@ -8,7 +8,7 @@ set(INCLUDE_LIST
 	"${Cloth_INCLUDE_ROOT}/ShapeData.h"
 	"${Cloth_INCLUDE_ROOT}/Vertex.h"
 	"${Cloth_INCLUDE_ROOT}/ObjectGenerator.h"
-	"${Cloth_INCLUDE_ROOT}/ClothCamera.hpp"
+	"${Cloth_INCLUDE_ROOT}/Triangle.hpp"
 	"${Cloth_INCLUDE_ROOT}/ClothScene.hpp"
 	"${Cloth_INCLUDE_ROOT}/Spring.hpp"
 	"${Cloth_INCLUDE_ROOT}/Particle.hpp"

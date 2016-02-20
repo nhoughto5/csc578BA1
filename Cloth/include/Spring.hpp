@@ -8,9 +8,10 @@ class Spring {
 public:
 	Spring(Particle *p1, Particle *p2);
 	~Spring();
-	void calculateForces();
+	void update();
+	GLfloat getLength();
 private:
-	GLfloat k;
+	GLfloat ks, kd;
 	Particle *p1, *p2;
 	GLfloat restLength, currentLength;
 };

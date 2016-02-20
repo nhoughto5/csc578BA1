@@ -18,34 +18,31 @@ public:
 	glm::mat4 getCameraMatrix();
 	void setPosition(glm::vec3 p);
 	void setLookat(glm::vec3 loc);
-	void setTarget(glm::vec3 loc);
 	void mouseUpdate(glm::vec2 newMousePosition);
 	void updateSlerp(atlas::utils::Time const& t);
 	void startSlerp(GLfloat duration);
 	bool isSlerping();
+	void setTarget(glm::vec3 loc);
 private:
-	bool slerping;
+	//Private Function
 	glm::quat vectorMulQuat(glm::quat q, glm::vec3 r);
 	void doSlerp(atlas::utils::Time const& t);
-	glm::mat4 getRotationMatrix(glm::vec3 forward_, glm::vec3 up_);
-	glm::quat getCurrentQuaternion();
-	glm::quat makeQuat(GLfloat angle, glm::vec3 axis);
 	void LookAt(glm::vec3 lookVector);
 	glm::vec3 getLeft();
 	glm::vec3 getRight();
 	bool equals(glm::vec3 a, glm::vec3 b);
-	glm::quat matrix4ToQuaternion(glm::mat4 matrix);
-	glm::mat4 quaternionToMatrix4(const glm::quat& q);
-	glm::quat getTargetQuaternion(), orientation;
 	void rotateX(GLfloat angle); //Pitch
 	void rotateY(GLfloat angle); //Yaw
 	glm::vec3 rotate(glm::vec3 source, GLfloat angle, glm::vec3 axis);
 	glm::vec3 rotate(glm::vec3 source, glm::quat q);
 	void move(glm::vec3 dir, GLfloat amt);
 	glm::vec3 getNormalized(glm::vec3 V);
+
+	//Members
 	glm::vec2 oldMousePosition;
-	glm::vec3 position,forward, up, yAxis, target;
+	glm::vec3 position, forward, up, yAxis, target;
 	glm::quat rotation, start, current;
 	GLfloat MOVEMENT_SPEED, ROTATION_SPEED, SPIN_SPEED, SLERP_DURATION, slerpProgress;
+	bool slerping;
 };
 #endif

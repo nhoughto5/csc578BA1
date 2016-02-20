@@ -14,69 +14,19 @@ ClothScene::ClothScene() :
 	mAnimLength(10.0f),
 	mSplineManager(int(mAnimLength * mFPS)),
 	ballPosition{ 4.0f, 0.0f, 4.0f },
-	mCloth(14, 10, 55, 45),
+	mCloth(8, 10, 55, 45),
 	mCamera()
 {
 	glEnable(GL_DEPTH_TEST);
 	auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);
 	mBall.transformGeometry(mat);
-	//mCamera.lookAt(ballPosition);
 }
 
 ClothScene::~ClothScene() {
 }
-
+//UNUSED
 void ClothScene::mousePressEvent(int button, int action, int modifiers, double xPos, double yPos) {
-//	USING_ATLAS_MATH_NS;
-//
-//	if (button == GLFW_MOUSE_BUTTON_LEFT && modifiers == GLFW_MOD_ALT)
-//	{
-//		if (action == GLFW_PRESS)
-//		{
-//			mIsDragging = true;
-//			//Camera tilt up and down or turn left, right
-//			mCamera.mouseDown(Point2(xPos, yPos), ClothCamera::CameraMovements::TUMBLE);
-//		}
-//		else
-//		{
-//			mIsDragging = false;
-//			mCamera.mouseUp();
-//		}
-//	}
-//	else if (button == GLFW_MOUSE_BUTTON_MIDDLE && modifiers == GLFW_MOD_ALT)
-//	{
-//		if (action == GLFW_PRESS)
-//		{
-//			mIsDragging = true;
-//			//Camera input left, right, up, down
-//			mCamera.mouseDown(Point2(xPos, yPos), ClothCamera::CameraMovements::TRACK);
-//		}
-//		else
-//		{
-//			mIsDragging = false;
-//			mCamera.mouseUp();
-//		}
-//	}
-//	else if (button == GLFW_MOUSE_BUTTON_RIGHT && modifiers == GLFW_MOD_ALT)
-//	{
-//		if (action == GLFW_PRESS)
-//		{
-//			// first click.
-//			mIsDragging = true;
-//			//Camera move back and forth
-//			mCamera.mouseDown(Point2(xPos, yPos), ClothCamera::CameraMovements::DOLLY);
-//		}
-//		else
-//		{
-//			mIsDragging = false;
-//			mCamera.mouseUp();
-//		}
-//	}
-//	else if (action != GLFW_PRESS)
-//	{
-//		mIsDragging = false;
-//		mCamera.mouseUp();
-//	}
+
 }
 void ClothScene::mouseMoveEvent(double xPos, double yPos) {
 	mCamera.mouseUpdate(glm::vec2(xPos, yPos));
@@ -152,7 +102,6 @@ void ClothScene::keyPressEvent(int key, int scancode, int action, int mods) {
 			break;
 		case GLFW_KEY_SPACE:
 			mIsPlaying = !mIsPlaying;
-
 		default:
 			break;
 		}
@@ -199,14 +148,13 @@ void ClothScene::updateScene(double time)
 			}
 
 			auto point = mSplineManager.getSplinePosition();
-			//std::cout << "Position: " << point.x << ", " << point.y << ", " << point.z << "\n";
-			mCamera.setPosition(point);	
-			//mCamera.lookAt(ballPosition);
+			mCamera.setPosition(point);	//Each point of the spline is a new position for the camera
 			auto mat = glm::translate(atlas::math::Matrix4(1.0f), ballPosition);
 			mBall.transformGeometry(mat);
 		}
 
 	}
+	//Update the SLERP procedure
 	if (mCamera.isSlerping()) {
 		mCamera.updateSlerp(mTime);
 	}
