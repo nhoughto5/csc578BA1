@@ -23,11 +23,11 @@ public:
 	glm::vec3 getVelocity();
 	int getPosX(), getPosY();
 private:	
-	glm::vec3 currentPosition, colour, previousPosition, forceOfGravity, totalForces, gravity, wind, velocity, mNormal;
+	glm::vec3 currentPosition, colour, mNormal, previousPosition, forceOfGravity, acceleration, gravity, wind, velocity;
 	bool stationary;
 	GLushort index;
-	GLfloat Damping;
+	GLfloat Damping, mass;
 	int posX, posY;
-	glm::vec3 verletIntegration(atlas::utils::Time const& t);
+	void verletIntegration(atlas::utils::Time const& t), eulerIntegration(atlas::utils::Time const& t);
 };
 #endif // !PARTICLE_HPP

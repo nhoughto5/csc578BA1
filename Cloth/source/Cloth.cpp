@@ -7,7 +7,11 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 	numParticlesWide(numParticlesWide_),
 	clothRotationVector{0.0f, 0.0f, 0.0f},
 	clothPosition{ 0.0f, 5.0f, 0.0f },
-	clothRotationAngle(0.0f)
+	clothRotationAngle(0.0f),
+	ambientLight{1.0f, 1.0f, 1.0f},
+	diffuseLightPosition{0.0f, 3.0f, 0.0f},
+	//gravity{0.0f, -9.81f, 0.0f} //Euler
+	gravity{ 0.0f, -0.2f, 0.0f } //Verlet
 {
 	USING_ATLAS_MATH_NS;
 	USING_ATLAS_GL_NS;
@@ -55,7 +59,6 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 	//for (int i = 0; i < numParticlesWide; ++i) {
 	//	getParticle(i, 0)->makeStationary();
 	//}
-
 	//Make Indices for Particles
 	for (GLuint row = 0; row < numParticlesWide - 1; ++row) {
 		for (GLuint col = 0; col < numParticlesHigh - 1; ++col) {
@@ -88,13 +91,15 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 	mShaders[0]->compileShaders(shaders);
 	mShaders[0]->linkShaders();
 	mUniforms.insert(UniformKey("mvpMat",mShaders[0]->getUniformVariable("mvpMat")));
+	//mUniforms.insert(UniformKey("ambientLight", mShaders[0]->getUniformVariable("ambientLight")));
+	//mUniforms.insert(UniformKey("diffuseLightPosition", mShaders[0]->getUniformVariable("diffuseLightPosition")));
 	mShaders[0]->disableShaders();
 }
 
 Cloth::~Cloth() {
 
 }
-void Cloth::addWindForceToTriangle(Particle* p1, Particle* p2, Particle* p3, glm::vec3 windForce) {
+glm::vec3 calculateNormal(Particle* p1, Particle* p2, Particle* p3) {
 	glm::vec3 pos1 = p1->getCurrentPosition();
 	glm::vec3 pos2 = p2->getCurrentPosition();
 	glm::vec3 pos3 = p3->getCurrentPosition();
@@ -102,8 +107,11 @@ void Cloth::addWindForceToTriangle(Particle* p1, Particle* p2, Particle* p3, glm
 	glm::vec3 v1 = pos2 - pos1;
 	glm::vec3 v2 = pos3 - pos1;
 
-	glm::vec3 normal = glm::cross(v1,v2);
-	normal = glm::normalize(normal);
+	return glm::cross(v1, v2);
+}
+void Cloth::addWindForceToTriangle(Particle* p1, Particle* p2, Particle* p3, glm::vec3 windForce) {
+
+	glm::vec3 normal = glm::normalize(calculateNormal(p1, p2, p3));
 	glm::vec3 force = normal * glm::dot(normal, windForce);
 	p1->addForce(force);
 	p2->addForce(force);
@@ -118,9 +126,28 @@ void Cloth::addWind(glm::vec3 windForce) {
 	}
 }
 void Cloth::renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4 view) {
+	for (std::vector<Particle>::iterator P = mParticles.begin(); P != mParticles.end(); ++P) {
+		P->resetNormal();
+	}
+	for (int x = 0; x<numParticlesWide - 1; x++){
+		for (int y = 0; y<numParticlesHigh - 1; y++)
+		{
+			glm::vec3 normal = calculateNormal(getParticle(x + 1, y), getParticle(x, y), getParticle(x, y + 1));
+			getParticle(x + 1, y)->addToNormal(normal);
+			getParticle(x, y)->addToNormal(normal);
+			getParticle(x, y + 1)->addToNormal(normal);
+
+			normal = calculateNormal(getParticle(x + 1, y + 1), getParticle(x + 1, y), getParticle(x, y + 1));
+			getParticle(x + 1, y + 1)->addToNormal(normal);
+			getParticle(x + 1, y)->addToNormal(normal);
+			getParticle(x, y + 1)->addToNormal(normal);
+		}
+	}
 	mShaders[0]->enableShaders();
 	auto mvpMat = projection * view * mModel;
 	glUniformMatrix4fv(mUniforms["mvpMat"], 1, GL_FALSE, &mvpMat[0][0]);
+	//glUniform3fv(mUniforms["ambientLight"], 1, &ambientLight[0]);
+	//glUniform3fv(mUniforms["diffuseLightPosition"], 1, &diffuseLightPosition[0]);
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, mParticleIndices.size(), GL_UNSIGNED_SHORT, nullptr);
 	mShaders[0]->disableShaders();
@@ -130,16 +157,17 @@ void Cloth::updateGeometry(atlas::utils::Time const& t) {
 	//Is a clean instance
 	for (int i = 0; i < mParticles.size(); ++i) {
 		mParticles[i].clearForces();
-		mParticles[i].addForce(glm::vec3(0.0f, -9.8f, 0.0f));
+		mParticles[i].addForce(gravity);
 	}
-	for (int i = 0; i < mSprings.size(); ++i) {
-		mSprings[i].update();
+	for (int X = 0; X < 1; ++X) {
+		for (int i = 0; i < mSprings.size(); ++i) {
+			mSprings[i].update();
+		}
 	}
-	
 	for (int i = 0; i < mParticles.size(); ++i) {
 		mParticles[i].updateGeometry(t);
 	}
-	//addWind(glm::vec3{0.5f, 0.0f, 0.2f} * t.deltaTime);
+	addWind(glm::vec3{0.5f, 0.0f, 0.2f} * t.deltaTime);
 	sendDataToGPU();
 }
 void Cloth::defineVAO() {
@@ -150,6 +178,7 @@ void Cloth::defineVAO() {
 	glBindBuffer(GL_ARRAY_BUFFER, clothVertexBufferID);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), 0); //Define vertex position buffer locations
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(3 * sizeof(float))); //Define vertex colour buffer locations
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Particle), (void*)(6 * sizeof(float))); //Define vertex colour buffer locations
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, clothIndexBufferID);
 }
 void Cloth::sendDataToGPU() {

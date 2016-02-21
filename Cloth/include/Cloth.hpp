@@ -26,7 +26,7 @@ private:
 	std::vector<Particle> mParticles;
 	std::vector<GLushort> mParticleIndices;
 	std::vector<Spring> mSprings;
-	glm::vec3 clothRotationVector, clothPosition;
+	glm::vec3 clothRotationVector, clothPosition, gravity, ambientLight, diffuseLightPosition;
 	GLfloat restLength;
 };
 #endif // !CLOTH_HPP

@@ -152,7 +152,7 @@ glm::quat QuatCamera::vectorMulQuat(glm::quat q, glm::vec3 r)
 glm::vec3 QuatCamera::getNormalized(glm::vec3 V) {
 	GLfloat length = glm::length(V);
 	if (length < 0.0000001) return glm::vec3{ 0.0f, 0.0f, 0.0f };
-	else return normalize(V);
+	else return glm::normalize(V);
 }
 //Generate a quaternion that represents the rotation required to
 //Rotate to look at the location specified by the lookVector

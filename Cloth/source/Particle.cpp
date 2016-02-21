@@ -4,14 +4,15 @@ Particle::Particle(glm::vec3 pos, GLushort index_, glm::vec3 colour_, int posX_,
 	currentPosition(pos),
 	previousPosition(pos),
 	stationary(false),
-	gravity{ 0.0f, -9.81f, 0.0f },
+	gravity{ 0.0f, -0.00002f, 0.0f },
 	wind{ 0.0f, 0.0f, 0.0f },
 	velocity{ 0.0f, 0.0f, 0.0f },
 	mNormal{ 0.0f, 0.0f, 0.0f },
 	index(index_),
 	colour(colour_),
-	Damping(1.0f),
-	totalForces{0.0f, 0.0f, 0.0f},
+	Damping(0.51f),
+	mass(1.0f),
+	acceleration{0.0f, 0.0f, 0.0f},
 	posX(posX),
 	posY(posY)
 {
@@ -21,23 +22,36 @@ Particle::Particle(glm::vec3 pos, GLushort index_, glm::vec3 colour_, int posX_,
 Particle::~Particle() {
 
 }
-glm::vec3 Particle::verletIntegration(atlas::utils::Time const& t) {
-	glm::vec3 nextPos;
-	nextPos = (2.0f * currentPosition) - previousPosition + totalForces * t.deltaTime;
-	return nextPos;
+void Particle::verletIntegration(atlas::utils::Time const& t) {
+	if (!stationary) {
+		glm::vec3 temp = currentPosition;
+		currentPosition = currentPosition + (currentPosition - previousPosition) * (1.0f - Damping) + (acceleration * t.deltaTime);
+		previousPosition = temp;
+	}
+}
+glm::vec3 vectorClamp(glm::vec3 V, GLfloat maxLength) {
+	GLfloat lengthSquared = V.x * V.x + V.y * V.y + V.z * V.z;
+	if ((lengthSquared > maxLength * maxLength) && (lengthSquared > 0.0f)) {
+		GLfloat ratio = maxLength / glm::sqrt(lengthSquared);
+		V *= ratio;
+	}
+	return V;
+}
+void Particle::eulerIntegration(atlas::utils::Time const& t) {
+	if (!stationary) {
+		currentPosition = currentPosition + (velocity * t.deltaTime);
+		velocity = velocity + (acceleration * t.deltaTime);
+		velocity = vectorClamp(velocity, 0.5f);
+	}
 }
 void Particle::updateGeometry(atlas::utils::Time const& t) {
-
-	velocity.x = totalForces.x * Damping;
-	velocity.y = totalForces.y * Damping;
-	velocity.z = totalForces.z * Damping;
-	glm::vec3 temp = currentPosition;
-	glm::vec3 next = verletIntegration(t);
-	if (!stationary) {
-		currentPosition = next;
-	}
-	previousPosition = temp;
-}
+	verletIntegration(t);
+	//eulerIntegration(t);
+	//if (index == 55) {
+	//	std::cout << "Total Force: " << acceleration.x << ", " << acceleration.y << ", " << acceleration.z << "    ";
+	//	std::cout << "Velocity: " << velocity.x << ", " << velocity.y << ", " << velocity.z << "\n";
+	//}
+} 
 glm::vec3 Particle::getColour() {
 	return colour;
 }
@@ -54,16 +68,23 @@ void Particle::setPosition(glm::vec3 newPos) {
 	currentPosition = newPos;
 }
 void Particle::offSetPosition(glm::vec3 newPos) {
-	currentPosition += newPos;
+	if(!stationary)	currentPosition += newPos;
 }
 glm::vec3 Particle::getCurrentPosition() {
 	return currentPosition;
 }
 void Particle::addForce(glm::vec3 force) {
-	totalForces += force;
+	acceleration += force / mass;
+	//if (index == 55) {
+	//	std::cout << "Add: " << force.x << ", " << force.y << ", " << force.z << "    Total Acceleration: ";
+	//	std::cout << acceleration.x << ", " << acceleration.y << ", " << acceleration.z << "\n";
+	//}
 }
 void Particle::clearForces() {
-	totalForces = glm::vec3{ 0.0f, 0.0f, 0.0f };
+	acceleration = glm::vec3{ 0.0f, 0.0f, 0.0f };
+	//if (index == 55) {
+	//	std::cout << acceleration.x << ", " << acceleration.y << ", " << acceleration.z << "\n";
+	//}
 }
 glm::vec3 Particle::getVelocity() {
 	return velocity;
@@ -75,7 +96,7 @@ void Particle::resetNormal() {
 	mNormal = glm::vec3{ 0.0f, 0.0f, 0.0f };
 }
 void Particle::addToNormal(glm::vec3 V) {
-	mNormal += V;
+	mNormal += glm::normalize(V);
 }
 int Particle::getPosX() {
 	return posX;
