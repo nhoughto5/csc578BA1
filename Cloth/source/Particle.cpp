@@ -29,6 +29,7 @@ void Particle::verletIntegration(atlas::utils::Time const& t) {
 		previousPosition = temp;
 	}
 }
+//Limit a vector's length to a maximum value
 glm::vec3 vectorClamp(glm::vec3 V, GLfloat maxLength) {
 	GLfloat lengthSquared = V.x * V.x + V.y * V.y + V.z * V.z;
 	if ((lengthSquared > maxLength * maxLength) && (lengthSquared > 0.0f)) {
