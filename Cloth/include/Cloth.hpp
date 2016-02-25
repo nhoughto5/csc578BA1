@@ -24,7 +24,7 @@ private:
 	GLuint numParticlesWide, numParticlesHigh, clothVertexBufferID, clothIndexBufferID;
 	GLuint VAO;
 	std::vector<Particle> mParticles;
-	std::vector<GLushort> mParticleIndices;
+	std::vector<GLuint> mParticleIndices;
 	std::vector<Spring> mSprings;
 	glm::vec3 clothRotationVector, clothPosition, gravity, ambientLight, diffuseLightPosition;
 	GLfloat restLength;

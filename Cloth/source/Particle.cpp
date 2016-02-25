@@ -1,6 +1,6 @@
 #include "Particle.hpp"
 #include <iostream>
-Particle::Particle(glm::vec3 pos, GLushort index_, glm::vec3 colour_, int posX_, int posY_) :
+Particle::Particle(glm::vec3 pos, GLuint index_, glm::vec3 colour_) :
 	currentPosition(pos),
 	previousPosition(pos),
 	stationary(false),
@@ -12,9 +12,9 @@ Particle::Particle(glm::vec3 pos, GLushort index_, glm::vec3 colour_, int posX_,
 	colour(colour_),
 	Damping(0.51f),
 	mass(1.0f),
-	acceleration{0.0f, 0.0f, 0.0f},
-	posX(posX),
-	posY(posY)
+	acceleration{0.0f, 0.0f, 0.0f}
+	//posX(posX),
+	//posY(posY)
 {
 
 }
@@ -59,7 +59,7 @@ glm::vec3 Particle::getColour() {
 void Particle::makeMoveable() {
 	stationary = false;
 }
-GLushort Particle::getIndex() {
+GLuint Particle::getIndex() {
 	return index;
 }
 void Particle::makeStationary() {
@@ -99,9 +99,9 @@ void Particle::resetNormal() {
 void Particle::addToNormal(glm::vec3 V) {
 	mNormal += glm::normalize(V);
 }
-int Particle::getPosX() {
-	return posX;
-}
-int Particle::getPosY(){
-	return posY;
-}
+//int Particle::getPosX() {
+//	return posX;
+//}
+//int Particle::getPosY(){
+//	return posY;
+//}

@@ -26,7 +26,11 @@ ClothScene::~ClothScene() {
 }
 //UNUSED
 void ClothScene::mousePressEvent(int button, int action, int modifiers, double xPos, double yPos) {
-
+	UNUSED(button);
+	UNUSED(action);
+	UNUSED(modifiers);
+	UNUSED(xPos);
+	UNUSED(yPos);
 }
 void ClothScene::mouseMoveEvent(double xPos, double yPos) {
 	mCamera.mouseUpdate(glm::vec2(xPos, yPos));

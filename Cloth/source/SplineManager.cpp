@@ -22,7 +22,7 @@ SplineManager::SplineManager(GLuint framesPerSpline_):
 
 	float scale = 1.0f / mResolution;
 	for (GLuint i = 0; i < mSplines.size(); ++i) {
-		for (int res = 0; res < mResolution + 1; ++res) {
+		for (GLuint res = 0; res < mResolution + 1; ++res) {
 			allSplinePoints.push_back(mSplines[i].evaluateSpline(scale * res));
 			allSplinePoints.push_back(mSplines[i].getColour());
 		}
@@ -84,7 +84,7 @@ void SplineManager::renderGeometry(atlas::math::Matrix4 projection, atlas::math:
 	glUniformMatrix4fv(mUniforms["uMVP"], 1, GL_FALSE, &mvp[0][0]);
 
 	glLineWidth(5.0f);
-	glDrawArrays(GL_LINE_STRIP, 0, (mResolution + 1) * mSplines.size());
+	glDrawArrays(GL_LINE_STRIP, 0, ((size_t)(mResolution + 1)) * mSplines.size());
 	glLineWidth(1.0f);
 	mShaders[0]->disableShaders();
 }

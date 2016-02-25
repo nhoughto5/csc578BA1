@@ -4,7 +4,7 @@
 #include <atlas/utils/Geometry.hpp>
 class Particle {
 public:
-	Particle(glm::vec3 pos, GLushort index_, glm::vec3 colour_, int posX, int posY);
+	Particle(glm::vec3 pos, GLuint index_, glm::vec3 colour_);
 	~Particle();
 
 	void updateGeometry(atlas::utils::Time const& t);
@@ -18,16 +18,14 @@ public:
 	void addToNormal(glm::vec3 V);
 	glm::vec3 getCurrentPosition();
 	glm::vec3 getColour();
-	GLushort getIndex();
+	GLuint getIndex();
 	void clearForces();
 	glm::vec3 getVelocity();
-	int getPosX(), getPosY();
 private:	
 	glm::vec3 currentPosition, colour, mNormal, previousPosition, forceOfGravity, acceleration, gravity, wind, velocity;
 	bool stationary;
-	GLushort index;
+	GLuint index;
 	GLfloat Damping, mass;
-	int posX, posY;
 	void verletIntegration(atlas::utils::Time const& t), eulerIntegration(atlas::utils::Time const& t);
 };
 #endif // !PARTICLE_HPP

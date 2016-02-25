@@ -22,7 +22,7 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 	for (GLuint y = 0; y < numParticlesHigh; ++y) {
 		for (GLuint x = 0; x < numParticlesWide; ++x) {
 			glm::vec3 pos = {(width * (x / (float)numParticlesWide)), (-height * (y / (float)numParticlesHigh)), 0.0f};
-			mParticles.push_back(Particle(pos, count, clothColour, x, y));
+			mParticles.push_back(Particle(pos, count, clothColour));
 			++count;
 		}
 	}
@@ -56,9 +56,7 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 	////Set the top left and right as stationary
 	getParticle(0, 0)->makeStationary();
 	getParticle(numParticlesWide - 1, 0)->makeStationary();
-	//for (int i = 0; i < numParticlesWide; ++i) {
-	//	getParticle(i, 0)->makeStationary();
-	//}
+
 	//Make Indices for Particles
 	for (GLuint row = 0; row < numParticlesWide - 1; ++row) {
 		for (GLuint col = 0; col < numParticlesHigh - 1; ++col) {
@@ -91,8 +89,6 @@ Cloth::Cloth(GLfloat width_, GLfloat height_, GLuint numParticlesWide_, GLuint n
 	mShaders[0]->compileShaders(shaders);
 	mShaders[0]->linkShaders();
 	mUniforms.insert(UniformKey("mvpMat",mShaders[0]->getUniformVariable("mvpMat")));
-	//mUniforms.insert(UniformKey("ambientLight", mShaders[0]->getUniformVariable("ambientLight")));
-	//mUniforms.insert(UniformKey("diffuseLightPosition", mShaders[0]->getUniformVariable("diffuseLightPosition")));
 	mShaders[0]->disableShaders();
 }
 
@@ -118,8 +114,8 @@ void Cloth::addWindForceToTriangle(Particle* p1, Particle* p2, Particle* p3, glm
 	p3->addForce(force);
 }
 void Cloth::addWind(glm::vec3 windForce) {
-	for (int x = 0; x < numParticlesWide-1; ++x) {
-		for (int y = 0; y < numParticlesHigh-1; ++y) {
+	for (GLuint x = 0; x < numParticlesWide-1; ++x) {
+		for (GLuint y = 0; y < numParticlesHigh-1; ++y) {
 			addWindForceToTriangle(getParticle(x + 1, y), getParticle(x, y), getParticle(x, y + 1), windForce);
 			addWindForceToTriangle(getParticle(x + 1, y + 1), getParticle(x + 1, y), getParticle(x, y + 1), windForce);
 		}
@@ -129,8 +125,8 @@ void Cloth::renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4
 	for (std::vector<Particle>::iterator P = mParticles.begin(); P != mParticles.end(); ++P) {
 		P->resetNormal();
 	}
-	for (int x = 0; x<numParticlesWide - 1; x++){
-		for (int y = 0; y<numParticlesHigh - 1; y++)
+	for (GLuint x = 0; x<numParticlesWide - 1; x++){
+		for (GLuint y = 0; y<numParticlesHigh - 1; y++)
 		{
 			glm::vec3 normal = calculateNormal(getParticle(x + 1, y), getParticle(x, y), getParticle(x, y + 1));
 			getParticle(x + 1, y)->addToNormal(normal);
@@ -146,10 +142,8 @@ void Cloth::renderGeometry(atlas::math::Matrix4 projection, atlas::math::Matrix4
 	mShaders[0]->enableShaders();
 	auto mvpMat = projection * view * mModel;
 	glUniformMatrix4fv(mUniforms["mvpMat"], 1, GL_FALSE, &mvpMat[0][0]);
-	//glUniform3fv(mUniforms["ambientLight"], 1, &ambientLight[0]);
-	//glUniform3fv(mUniforms["diffuseLightPosition"], 1, &diffuseLightPosition[0]);
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, mParticleIndices.size(), GL_UNSIGNED_SHORT, nullptr);
+	glDrawElements(GL_TRIANGLES, (GLsizei)mParticleIndices.size(), GL_UNSIGNED_SHORT, nullptr);
 	mShaders[0]->disableShaders();
 }
 void Cloth::updateGeometry(atlas::utils::Time const& t) {
